@@ -2,6 +2,20 @@
   <div class="drag-wrapper">
     <main class="container">
       <div class="player-card">
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              :style="{ width: progressPercentage + '%' }"
+            ></div>
+          </div>
+          <div class="time-display">
+            <span class="time-current">{{ formatTime(currentPosition) }}</span>
+            <span class="time-total">{{
+              formatTime(mediaInfo?.duration || 0)
+            }}</span>
+          </div>
+        </div>
         <Controls
           class="controls"
           :is-playing="isPlaying"
@@ -9,22 +23,13 @@
           @prev="playPrevious"
           @next="playNext"
         />
-        <div class="slider">
-          <input
-            type="range"
-            min="0"
-            :max="mediaInfo ? mediaInfo.duration : 0"
-            v-model="currentPosition"
-            @change="controlPlayback('seek')"
-          />
-        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import Controls from "./components/Controls.vue";
@@ -51,6 +56,14 @@ const showSessionPicker = ref(false);
 const isPlaying = ref(false);
 const currentPosition = ref(0);
 let updateInterval: number | null = null;
+
+// 计算进度百分比
+const progressPercentage = computed(() => {
+  if (!mediaInfo.value || mediaInfo.value.duration === 0) {
+    return 0;
+  }
+  return (currentPosition.value / mediaInfo.value.duration) * 100;
+});
 
 async function loadSessions() {
   try {
@@ -205,16 +218,46 @@ body {
   border-radius: 26px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.progress-container {
+  width: 100%;
+  margin-bottom: -10px;
+}
+
+.progress-bar {
+  height: 5px;
+  background-color: rgba(200, 200, 200, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 5px;
+  margin-bottom: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
 }
 
 .controls {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
+  margin-bottom: -5px;
 }
 </style>
