@@ -12,13 +12,14 @@
   "app": {
     "windows": [
       {
-        "title": "player-component",
-        "width": 326,
-        "height": 165,
+        "title": "Music Player",
+        "width": 700,
+        "height": 400,
         "decorations": false,
         "transparent": true,
         "shadow": false,
         "resizable": false,
+        "alwaysOnTop": true,
         "titleBarStyle": "Overlay"
       }
     ],
