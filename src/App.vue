@@ -1,7 +1,18 @@
+<template>
+  <div class="drag-wrapper">
+    <main class="container">
+      <div class="player-card">
+        <Controls @toggle="togglePlayPause" />
+      </div>
+    </main>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
+import Controls from "./components/Controls.vue";
 
 interface MediaInfo {
   title: string;
@@ -126,14 +137,6 @@ onUnmounted(() => {
   }
 });
 </script>
-
-<template>
-  <div class="drag-wrapper">
-    <main class="container">
-      <div class="player-card"></div>
-    </main>
-  </div>
-</template>
 
 <style scoped>
 * {
