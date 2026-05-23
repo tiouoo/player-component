@@ -48,9 +48,11 @@
         <Controls
           class="controls"
           :is-playing="isPlaying"
+          :is-muted="isMuted"
           @toggle="togglePlayPause"
           @prev="playPrevious"
           @next="playNext"
+          @toggle-mute="toggleMute"
           @show-sessions="showSessionPicker = !showSessionPicker"
         />
 
@@ -103,6 +105,8 @@ const selectedSessionId = ref<string | null>(null);
 const showSessionPicker = ref(false);
 const isPlaying = ref(false);
 const currentPosition = ref(0);
+const isMuted = ref(false);
+const savedVolume = ref(1.0);
 let updateInterval: number | null = null;
 
 // 计算进度百分比
@@ -165,6 +169,12 @@ function selectSession(sessionId: string) {
   selectedSessionId.value = sessionId;
   showSessionPicker.value = false;
   loadMediaInfo();
+}
+
+function toggleMute() {
+  isMuted.value = !isMuted.value;
+  // 这里可以添加实际的音量控制逻辑
+  // 例如调用 Tauri 后端的音量控制命令
 }
 
 function formatTime(seconds: number): string {
