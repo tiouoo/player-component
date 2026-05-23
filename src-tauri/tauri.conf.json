@@ -13,11 +13,12 @@
     "windows": [
       {
         "title": "player-component",
-        "width": 800,
-        "height": 600,
+        "width": 326,
+        "height": 165,
         "decorations": false,
         "transparent": true,
         "shadow": false,
+        "resizable": false,
         "titleBarStyle": "Overlay"
       }
     ],

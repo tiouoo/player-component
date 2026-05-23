@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { invoke } from "@tauri-apps/api/core";
+import { onMounted } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-
-const greetMsg = ref("");
-const name = ref("");
 
 async function greet() {
   greetMsg.value = await invoke("greet", { name: name.value });
@@ -45,38 +41,9 @@ onMounted(() => {
   <div class="drag-wrapper">
     <main class="container">
       <h1>Welcome to Tauri + Vue</h1>
-
-      <div class="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://vuejs.org/" target="_blank">
-          <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-      <form class="row" @submit.prevent="greet">
-        <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{{ greetMsg }}</p>
     </main>
   </div>
 </template>
-
-<style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-</style>
 
 <style>
 :root {
@@ -111,16 +78,16 @@ body {
 
 .container {
   margin: 0;
-  padding: 20px;
-  padding-top: 10vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  min-height: 100vh;
-  background-color: rgba(255, 255, 255, 0.8);
+  height: 165px;
+  width: 326px;
+  background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  border-radius: 26px;
 }
 
 .logo {
@@ -201,30 +168,5 @@ input {
 
 #greet-input {
   margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: transparent;
-  }
-
-  .container {
-    background-color: rgba(47, 47, 47, 0.8);
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-
-  button:active {
-    background-color: #0f0f0f69;
-  }
 }
 </style>
