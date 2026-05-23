@@ -425,6 +425,7 @@ defineEmits<{
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  pointer-events: auto;
 }
 
 .control-btn:hover {

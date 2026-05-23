@@ -117,7 +117,7 @@ const isMuted = ref(false);
 const savedVolume = ref(1.0);
 const isDarkMode = ref(false);
 // 显示模式: 0=黑色文字无背景, 1=白色文字有背景, 2=白色文字无背景, 3=黑色文字有背景
-const displayMode = ref(0);
+const displayMode = ref(2);
 let updateInterval: number | null = null;
 
 // 计算进度百分比
@@ -213,14 +213,9 @@ onMounted(() => {
   document.addEventListener("mousedown", async (e) => {
     const target = e.target as HTMLElement;
 
-    // 如果点击的是交互元素,不触发拖动
-    if (
-      target.tagName === "INPUT" ||
-      target.tagName === "BUTTON" ||
-      target.tagName === "A" ||
-      target.closest("button") ||
-      target.closest(".session-picker")
-    ) {
+    // 只有点击控制按钮或会话选择器时才不触发拖动
+    // 其他所有区域（图片、文字、背景等）都可以拖动
+    if (target.closest(".control-btn") || target.closest(".session-picker")) {
       return;
     }
 
@@ -250,7 +245,7 @@ onMounted(() => {
     loadMediaInfo();
     if (isPlaying.value && mediaInfo.value) {
       currentPosition.value = Math.min(
-        currentPosition.value + 1,
+        currentPosition.value,
         mediaInfo.value.duration,
       );
     }
@@ -422,12 +417,12 @@ body {
 
 .mode-0 .track-title,
 .mode-3 .track-title {
-  color: rgba(20, 20, 20, 0.95);
+  color: rgba(20, 20, 20);
 }
 
 .mode-1 .track-title,
 .mode-2 .track-title {
-  color: rgba(240, 240, 240, 0.95);
+  color: rgb(255, 255, 255);
 }
 
 .track-artist {
@@ -441,12 +436,14 @@ body {
 
 .mode-0 .track-artist,
 .mode-3 .track-artist {
-  color: rgba(60, 60, 60, 0.8);
+  /* color: rgba(60, 60, 60, 1); */
+  color: rgba(20, 20, 20);
 }
 
 .mode-1 .track-artist,
 .mode-2 .track-artist {
-  color: rgba(180, 180, 180, 0.8);
+  /* color: rgba(180, 180, 180, 1); */
+  color: rgb(255, 255, 255);
 }
 
 .progress-container {
@@ -485,12 +482,12 @@ body {
 
 .mode-0 .progress-fill,
 .mode-3 .progress-fill {
-  background-color: rgba(40, 40, 40, 0.9);
+  background-color: rgba(70, 70, 70, 0.9);
 }
 
 .mode-1 .progress-fill,
 .mode-2 .progress-fill {
-  background-color: rgba(200, 200, 200, 0.9);
+  background-color: rgb(255, 255, 255);
 }
 
 .time-display {
@@ -506,12 +503,14 @@ body {
 
 .mode-0 .time-display,
 .mode-3 .time-display {
-  color: rgba(80, 80, 80, 0.8);
+  /* color: rgba(80, 80, 80, 0.8); */
+  color: rgba(20, 20, 20);
 }
 
 .mode-1 .time-display,
 .mode-2 .time-display {
-  color: rgba(160, 160, 160, 0.8);
+  /* color: rgba(160, 160, 160, 0.8); */
+  color: rgb(255, 255, 255);
 }
 
 .controls {
