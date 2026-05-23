@@ -260,8 +260,8 @@ body {
 }
 
 .album-cover {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 12px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
@@ -318,7 +318,7 @@ body {
 .progress-container {
   width: 100%;
   position: relative;
-  top: 2px;
+  top: 3px;
   margin-bottom: -4px;
 }
 
@@ -327,7 +327,6 @@ body {
   background-color: rgba(200, 200, 200, 0.3);
   border-radius: 2px;
   overflow: hidden;
-  margin: 0 5px;
   margin-bottom: 4px;
 }
 
@@ -352,6 +351,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-bottom: -5px;
+  margin-bottom: -12px;
 }
 </style>
