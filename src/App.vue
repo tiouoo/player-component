@@ -1,5 +1,11 @@
 <template>
-  <div class="drag-wrapper" :class="{ 'dark-mode': isDarkMode }">
+  <div
+    class="drag-wrapper"
+    :class="[
+      `mode-${displayMode}`,
+      { 'has-background': displayMode === 1 || displayMode === 3 },
+    ]"
+  >
     <main class="container">
       <div class="player-card">
         <div class="media-info">
@@ -50,7 +56,7 @@
           class="controls"
           :is-playing="isPlaying"
           :is-muted="isMuted"
-          :is-dark-mode="isDarkMode"
+          :display-mode="displayMode"
           @toggle="togglePlayPause"
           @prev="playPrevious"
           @next="playNext"
@@ -110,6 +116,8 @@ const currentPosition = ref(0);
 const isMuted = ref(false);
 const savedVolume = ref(1.0);
 const isDarkMode = ref(false);
+// 显示模式: 0=黑色文字无背景, 1=白色文字有背景, 2=白色文字无背景, 3=黑色文字有背景
+const displayMode = ref(0);
 let updateInterval: number | null = null;
 
 // 计算进度百分比
@@ -224,12 +232,11 @@ onMounted(() => {
     }
   });
 
-  // 监听 Ctrl+Q 切换深色模式
+  // 监听 Ctrl+Q 切换显示模式
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.key === "q") {
       e.preventDefault();
-      isDarkMode.value = !isDarkMode.value;
-      document.body.classList.toggle("dark-mode", isDarkMode.value);
+      displayMode.value = (displayMode.value + 1) % 4;
     }
   });
 
@@ -308,10 +315,28 @@ body {
   transition: all 0.3s ease;
 }
 
-/* 深色模式样式 */
-.dark-mode .player-card {
+/* 模式 0: 黑色文字无背景 */
+.mode-0 .player-card {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* 模式 1: 白色文字有背景 */
+.mode-1 .player-card {
   background: rgba(20, 20, 20, 0.7);
   border: 1px solid rgba(80, 80, 80, 0.4);
+}
+
+/* 模式 2: 白色文字无背景 */
+.mode-2 .player-card {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* 模式 3: 黑色文字有背景 */
+.mode-3 .player-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(200, 200, 200, 0.4);
 }
 
 .media-info {
@@ -338,7 +363,13 @@ body {
   transition: background 0.3s ease;
 }
 
-.dark-mode .album-cover {
+.mode-0 .album-cover,
+.mode-3 .album-cover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mode-1 .album-cover,
+.mode-2 .album-cover {
   background: rgba(60, 60, 60, 0.3);
 }
 
@@ -361,7 +392,13 @@ body {
   height: 32px;
 }
 
-.dark-mode .album-placeholder svg path {
+.mode-0 .album-placeholder svg path,
+.mode-3 .album-placeholder svg path {
+  fill: rgba(80, 80, 80, 0.5);
+}
+
+.mode-1 .album-placeholder svg path,
+.mode-2 .album-placeholder svg path {
   fill: rgba(180, 180, 180, 0.5);
 }
 
@@ -383,7 +420,13 @@ body {
   transition: color 0.3s ease;
 }
 
-.dark-mode .track-title {
+.mode-0 .track-title,
+.mode-3 .track-title {
+  color: rgba(20, 20, 20, 0.95);
+}
+
+.mode-1 .track-title,
+.mode-2 .track-title {
   color: rgba(240, 240, 240, 0.95);
 }
 
@@ -396,7 +439,13 @@ body {
   transition: color 0.3s ease;
 }
 
-.dark-mode .track-artist {
+.mode-0 .track-artist,
+.mode-3 .track-artist {
+  color: rgba(60, 60, 60, 0.8);
+}
+
+.mode-1 .track-artist,
+.mode-2 .track-artist {
   color: rgba(180, 180, 180, 0.8);
 }
 
@@ -416,7 +465,13 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.dark-mode .progress-bar {
+.mode-0 .progress-bar,
+.mode-3 .progress-bar {
+  background-color: rgba(100, 100, 100, 0.3);
+}
+
+.mode-1 .progress-bar,
+.mode-2 .progress-bar {
   background-color: rgba(80, 80, 80, 0.5);
 }
 
@@ -428,7 +483,13 @@ body {
     background-color 0.3s ease;
 }
 
-.dark-mode .progress-fill {
+.mode-0 .progress-fill,
+.mode-3 .progress-fill {
+  background-color: rgba(40, 40, 40, 0.9);
+}
+
+.mode-1 .progress-fill,
+.mode-2 .progress-fill {
   background-color: rgba(200, 200, 200, 0.9);
 }
 
@@ -443,7 +504,13 @@ body {
   transition: color 0.3s ease;
 }
 
-.dark-mode .time-display {
+.mode-0 .time-display,
+.mode-3 .time-display {
+  color: rgba(80, 80, 80, 0.8);
+}
+
+.mode-1 .time-display,
+.mode-2 .time-display {
   color: rgba(160, 160, 160, 0.8);
 }
 
@@ -475,7 +542,15 @@ body {
   transition: all 0.3s ease;
 }
 
-.dark-mode .session-picker {
+.mode-0 .session-picker,
+.mode-3 .session-picker {
+  background: rgba(240, 240, 240, 0.95);
+  border: 1px solid rgba(180, 180, 180, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.mode-1 .session-picker,
+.mode-2 .session-picker {
   background: rgba(25, 25, 25, 0.95);
   border: 1px solid rgba(100, 100, 100, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
@@ -490,7 +565,13 @@ body {
   border-radius: 3px;
 }
 
-.dark-mode .session-picker::-webkit-scrollbar-track {
+.mode-0 .session-picker::-webkit-scrollbar-track,
+.mode-3 .session-picker::-webkit-scrollbar-track {
+  background: rgba(180, 180, 180, 0.2);
+}
+
+.mode-1 .session-picker::-webkit-scrollbar-track,
+.mode-2 .session-picker::-webkit-scrollbar-track {
   background: rgba(100, 100, 100, 0.2);
 }
 
@@ -500,7 +581,13 @@ body {
   transition: background 0.2s ease;
 }
 
-.dark-mode .session-picker::-webkit-scrollbar-thumb {
+.mode-0 .session-picker::-webkit-scrollbar-thumb,
+.mode-3 .session-picker::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 120, 0.5);
+}
+
+.mode-1 .session-picker::-webkit-scrollbar-thumb,
+.mode-2 .session-picker::-webkit-scrollbar-thumb {
   background: rgba(120, 120, 120, 0.5);
 }
 
@@ -508,7 +595,13 @@ body {
   background: rgba(255, 255, 255, 0.5);
 }
 
-.dark-mode .session-picker::-webkit-scrollbar-thumb:hover {
+.mode-0 .session-picker::-webkit-scrollbar-thumb:hover,
+.mode-3 .session-picker::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.7);
+}
+
+.mode-1 .session-picker::-webkit-scrollbar-thumb:hover,
+.mode-2 .session-picker::-webkit-scrollbar-thumb:hover {
   background: rgba(150, 150, 150, 0.7);
 }
 
@@ -531,7 +624,14 @@ body {
   margin-bottom: 4px;
 }
 
-.dark-mode .session-picker-header {
+.mode-0 .session-picker-header,
+.mode-3 .session-picker-header {
+  color: rgba(80, 80, 80, 0.7);
+  border-bottom: 1px solid rgba(150, 150, 150, 0.3);
+}
+
+.mode-1 .session-picker-header,
+.mode-2 .session-picker-header {
   color: rgba(180, 180, 180, 0.7);
   border-bottom: 1px solid rgba(100, 100, 100, 0.3);
 }
@@ -554,11 +654,23 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.dark-mode .session-item {
+.mode-0 .session-item,
+.mode-3 .session-item {
+  color: rgba(40, 40, 40, 0.95);
+}
+
+.mode-0 .session-item:hover,
+.mode-3 .session-item:hover {
+  background: rgba(150, 150, 150, 0.3);
+}
+
+.mode-1 .session-item,
+.mode-2 .session-item {
   color: rgba(220, 220, 220, 0.95);
 }
 
-.dark-mode .session-item:hover {
+.mode-1 .session-item:hover,
+.mode-2 .session-item:hover {
   background: rgba(100, 100, 100, 0.3);
 }
 
@@ -567,7 +679,13 @@ body {
   font-weight: 500;
 }
 
-.dark-mode .session-item.active {
+.mode-0 .session-item.active,
+.mode-3 .session-item.active {
+  background: rgba(150, 150, 150, 0.4);
+}
+
+.mode-1 .session-item.active,
+.mode-2 .session-item.active {
   background: rgba(120, 120, 120, 0.4);
 }
 
@@ -579,7 +697,13 @@ body {
   transition: color 0.3s ease;
 }
 
-.dark-mode .no-sessions {
+.mode-0 .no-sessions,
+.mode-3 .no-sessions {
+  color: rgba(100, 100, 100, 0.6);
+}
+
+.mode-1 .no-sessions,
+.mode-2 .no-sessions {
   color: rgba(150, 150, 150, 0.6);
 }
 </style>
