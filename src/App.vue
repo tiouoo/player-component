@@ -51,7 +51,26 @@
           @toggle="togglePlayPause"
           @prev="playPrevious"
           @next="playNext"
+          @show-sessions="showSessionPicker = !showSessionPicker"
         />
+
+        <!-- 会话选择弹出菜单 -->
+        <div v-if="showSessionPicker" class="session-picker">
+          <div class="session-list">
+            <button
+              v-for="session in sessions"
+              :key="session.id"
+              class="session-item"
+              :class="{ active: session.id === selectedSessionId }"
+              @click="selectSession(session.id)"
+            >
+              {{ session.name }}
+            </button>
+            <div v-if="sessions.length === 0" class="no-sessions">
+              未找到正在播放的应用
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -352,5 +371,92 @@ body {
   justify-content: center;
   gap: 16px;
   margin-bottom: -12px;
+}
+
+.session-picker {
+  position: absolute;
+  bottom: 55px;
+  right: 18px;
+  background: rgba(40, 40, 40, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  min-width: 200px;
+  max-width: 280px;
+  max-height: 92px;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  animation: slideUp 0.2s ease;
+}
+
+.session-picker::-webkit-scrollbar {
+  width: 6px;
+}
+
+.session-picker::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.session-picker::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.session-picker::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.session-picker-header {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 4px;
+}
+
+.session-item {
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  display: block;
+}
+
+.session-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.session-item.active {
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 500;
+}
+
+.no-sessions {
+  padding: 20px 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
 }
 </style>
