@@ -188,7 +188,6 @@
                 ? 'rgba(20, 20, 20, 0.9)'
                 : 'white'
             "
-            fill="white"
           />
         </g>
         <defs>

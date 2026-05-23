@@ -114,8 +114,6 @@ const showSessionPicker = ref(false);
 const isPlaying = ref(false);
 const currentPosition = ref(0);
 const isMuted = ref(false);
-const savedVolume = ref(1.0);
-const isDarkMode = ref(false);
 // 显示模式: 0=黑色文字无背景, 1=白色文字有背景, 2=白色文字无背景, 3=黑色文字有背景
 const displayMode = ref(2);
 let updateInterval: number | null = null;
