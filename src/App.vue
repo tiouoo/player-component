@@ -2,7 +2,22 @@
   <div class="drag-wrapper">
     <main class="container">
       <div class="player-card">
-        <Controls @toggle="togglePlayPause" />
+        <Controls
+          class="controls"
+          :is-playing="isPlaying"
+          @toggle="togglePlayPause"
+          @prev="playPrevious"
+          @next="playNext"
+        />
+        <div class="slider">
+          <input
+            type="range"
+            min="0"
+            :max="mediaInfo ? mediaInfo.duration : 0"
+            v-model="currentPosition"
+            @change="controlPlayback('seek')"
+          />
+        </div>
       </div>
     </main>
   </div>
@@ -75,6 +90,14 @@ function togglePlayPause() {
   } else {
     controlPlayback("play");
   }
+}
+
+function playNext() {
+  controlPlayback("next");
+}
+
+function playPrevious() {
+  controlPlayback("previous");
 }
 
 function selectSession(sessionId: string) {
@@ -182,5 +205,16 @@ body {
   border-radius: 26px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   overflow: hidden;
+}
+
+.controls {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 </style>
