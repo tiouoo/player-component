@@ -14,12 +14,17 @@
       {
         "title": "player-component",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "titleBarStyle": "Overlay"
       }
     ],
     "security": {
       "csp": null
-    }
+    },
+    "withGlobalTauri": true
   },
   "bundle": {
     "active": true,
