@@ -2,6 +2,35 @@
   <div class="drag-wrapper">
     <main class="container">
       <div class="player-card">
+        <div class="media-info">
+          <div class="album-cover">
+            <img
+              v-if="mediaInfo?.thumbnail"
+              :src="mediaInfo.thumbnail"
+              alt="专辑封面"
+            />
+            <div v-else class="album-placeholder">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"
+                  fill="rgba(255, 255, 255, 0.5)"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="track-info">
+            <div class="track-title">
+              {{ mediaInfo?.title || "未知歌曲" }}
+            </div>
+            <div class="track-artist">
+              {{ mediaInfo?.artist || "未知艺术家" }}
+            </div>
+          </div>
+        </div>
         <div class="progress-container">
           <div class="progress-bar">
             <div
@@ -220,12 +249,77 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
+}
+
+.media-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.album-cover {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.album-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.album-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.album-placeholder svg {
+  width: 32px;
+  height: 32px;
+}
+
+.track-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track-title {
+  font-size: 15px;
+  font-weight: 100;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-artist {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .progress-container {
   width: 100%;
-  margin-bottom: -10px;
+  position: relative;
+  top: 2px;
+  margin-bottom: -4px;
 }
 
 .progress-bar {
