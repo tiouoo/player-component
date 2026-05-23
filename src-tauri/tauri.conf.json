@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "Music Player",
-        "width": 700,
-        "height": 400,
+        "title": "player-component",
+        "width": 326,
+        "height": 165,
         "decorations": false,
         "transparent": true,
         "shadow": false,
