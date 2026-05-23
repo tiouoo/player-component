@@ -1,5 +1,5 @@
 <template>
-  <div class="drag-wrapper">
+  <div class="drag-wrapper" :class="{ 'dark-mode': isDarkMode }">
     <main class="container">
       <div class="player-card">
         <div class="media-info">
@@ -50,6 +50,7 @@
           class="controls"
           :is-playing="isPlaying"
           :is-muted="isMuted"
+          :is-dark-mode="isDarkMode"
           @toggle="togglePlayPause"
           @prev="playPrevious"
           @next="playNext"
@@ -108,6 +109,7 @@ const isPlaying = ref(false);
 const currentPosition = ref(0);
 const isMuted = ref(false);
 const savedVolume = ref(1.0);
+const isDarkMode = ref(false);
 let updateInterval: number | null = null;
 
 // 计算进度百分比
@@ -222,6 +224,15 @@ onMounted(() => {
     }
   });
 
+  // 监听 Ctrl+Q 切换深色模式
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.key === "q") {
+      e.preventDefault();
+      isDarkMode.value = !isDarkMode.value;
+      document.body.classList.toggle("dark-mode", isDarkMode.value);
+    }
+  });
+
   // 初始加载
   loadSessions();
   loadMediaInfo();
@@ -270,6 +281,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 }
 
 .container {
@@ -293,6 +305,13 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+/* 深色模式样式 */
+.dark-mode .player-card {
+  background: rgba(20, 20, 20, 0.7);
+  border: 1px solid rgba(80, 80, 80, 0.4);
 }
 
 .media-info {
@@ -301,9 +320,11 @@ body {
   gap: 12px;
   margin-bottom: 8px;
 }
+
 .img {
   opacity: 0.9;
 }
+
 .album-cover {
   width: 52px;
   height: 52px;
@@ -313,6 +334,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.3s ease;
+}
+
+.dark-mode .album-cover {
+  background: rgba(60, 60, 60, 0.3);
 }
 
 .album-cover img {
@@ -334,6 +361,10 @@ body {
   height: 32px;
 }
 
+.dark-mode .album-placeholder svg path {
+  fill: rgba(180, 180, 180, 0.5);
+}
+
 .track-info {
   flex: 1;
   min-width: 0;
@@ -349,6 +380,11 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .track-title {
+  color: rgba(240, 240, 240, 0.95);
 }
 
 .track-artist {
@@ -357,6 +393,11 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .track-artist {
+  color: rgba(180, 180, 180, 0.8);
 }
 
 .progress-container {
@@ -372,12 +413,23 @@ body {
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .progress-bar {
+  background-color: rgba(80, 80, 80, 0.5);
 }
 
 .progress-fill {
   height: 100%;
   background-color: white;
-  transition: width 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.dark-mode .progress-fill {
+  background-color: rgba(200, 200, 200, 0.9);
 }
 
 .time-display {
@@ -388,6 +440,11 @@ body {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .time-display {
+  color: rgba(160, 160, 160, 0.8);
 }
 
 .controls {
@@ -415,6 +472,13 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   z-index: 1000;
   animation: slideUp 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+.dark-mode .session-picker {
+  background: rgba(25, 25, 25, 0.95);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .session-picker::-webkit-scrollbar {
@@ -426,14 +490,26 @@ body {
   border-radius: 3px;
 }
 
+.dark-mode .session-picker::-webkit-scrollbar-track {
+  background: rgba(100, 100, 100, 0.2);
+}
+
 .session-picker::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
   transition: background 0.2s ease;
 }
 
+.dark-mode .session-picker::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 120, 0.5);
+}
+
 .session-picker::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+
+.dark-mode .session-picker::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.7);
 }
 
 @keyframes slideUp {
@@ -455,6 +531,11 @@ body {
   margin-bottom: 4px;
 }
 
+.dark-mode .session-picker-header {
+  color: rgba(180, 180, 180, 0.7);
+  border-bottom: 1px solid rgba(100, 100, 100, 0.3);
+}
+
 .session-item {
   width: 100%;
   padding: 10px 12px;
@@ -473,9 +554,21 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.dark-mode .session-item {
+  color: rgba(220, 220, 220, 0.95);
+}
+
+.dark-mode .session-item:hover {
+  background: rgba(100, 100, 100, 0.3);
+}
+
 .session-item.active {
   background: rgba(255, 255, 255, 0.15);
   font-weight: 500;
+}
+
+.dark-mode .session-item.active {
+  background: rgba(120, 120, 120, 0.4);
 }
 
 .no-sessions {
@@ -483,5 +576,10 @@ body {
   text-align: center;
   color: rgba(255, 255, 255, 0.5);
   font-size: 12px;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .no-sessions {
+  color: rgba(150, 150, 150, 0.6);
 }
 </style>
