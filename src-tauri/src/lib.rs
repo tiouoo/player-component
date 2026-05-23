@@ -20,6 +20,14 @@ pub struct MediaSession {
 #[cfg(windows)]
 mod windows_media {
     use super::*;
+    use std::sync::Mutex;
+    use windows::Win32::Media::Audio::{
+        eConsole, eRender, Endpoints::IAudioEndpointVolume, IMMDevice, IMMDeviceEnumerator,
+        MMDeviceEnumerator,
+    };
+    use windows::Win32::System::Com::{
+        CoCreateInstance, CoInitializeEx, CLSCTX_ALL, COINIT_MULTITHREADED,
+    };
     use windows::{
         Foundation::IAsyncOperation,
         Media::Control::{
@@ -291,6 +299,87 @@ mod windows_media {
 
         Ok(())
     }
+
+    // 音量控制相关函数
+    static SAVED_VOLUME: Mutex<Option<f32>> = Mutex::new(None);
+
+    fn get_audio_endpoint() -> Result<IAudioEndpointVolume, String> {
+        unsafe {
+            CoInitializeEx(None, COINIT_MULTITHREADED)
+                .ok()
+                .map_err(|e| format!("Failed to initialize COM: {}", e))?;
+
+            let enumerator: IMMDeviceEnumerator =
+                CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL)
+                    .map_err(|e| format!("Failed to create device enumerator: {}", e))?;
+
+            let device: IMMDevice = enumerator
+                .GetDefaultAudioEndpoint(eRender, eConsole)
+                .map_err(|e| format!("Failed to get default audio endpoint: {}", e))?;
+
+            let endpoint_volume: IAudioEndpointVolume = device
+                .Activate(CLSCTX_ALL, None)
+                .map_err(|e| format!("Failed to activate audio endpoint: {}", e))?;
+
+            Ok(endpoint_volume)
+        }
+    }
+
+    pub fn get_system_volume() -> Result<f32, String> {
+        unsafe {
+            let endpoint = get_audio_endpoint()?;
+            let volume = endpoint
+                .GetMasterVolumeLevelScalar()
+                .map_err(|e| format!("Failed to get volume: {}", e))?;
+            Ok(volume)
+        }
+    }
+
+    pub fn set_system_volume(volume: f32) -> Result<(), String> {
+        unsafe {
+            let endpoint = get_audio_endpoint()?;
+            let clamped_volume = volume.clamp(0.0, 1.0);
+            endpoint
+                .SetMasterVolumeLevelScalar(clamped_volume, std::ptr::null())
+                .map_err(|e| format!("Failed to set volume: {}", e))?;
+            Ok(())
+        }
+    }
+
+    pub fn toggle_mute_sync() -> Result<bool, String> {
+        unsafe {
+            let endpoint = get_audio_endpoint()?;
+
+            // 获取当前静音状态
+            let is_muted = endpoint
+                .GetMute()
+                .map_err(|e| format!("Failed to get mute state: {}", e))?;
+
+            if is_muted.as_bool() {
+                // 当前是静音，取消静音
+                endpoint
+                    .SetMute(windows::Win32::Foundation::BOOL(0), std::ptr::null())
+                    .map_err(|e| format!("Failed to unmute: {}", e))?;
+                Ok(false)
+            } else {
+                // 当前不是静音，设置静音
+                endpoint
+                    .SetMute(windows::Win32::Foundation::BOOL(1), std::ptr::null())
+                    .map_err(|e| format!("Failed to mute: {}", e))?;
+                Ok(true)
+            }
+        }
+    }
+
+    pub fn get_mute_state() -> Result<bool, String> {
+        unsafe {
+            let endpoint = get_audio_endpoint()?;
+            let is_muted = endpoint
+                .GetMute()
+                .map_err(|e| format!("Failed to get mute state: {}", e))?;
+            Ok(is_muted.as_bool())
+        }
+    }
 }
 
 #[cfg(not(windows))]
@@ -306,6 +395,14 @@ mod windows_media {
     }
 
     pub fn control_playback_sync(_action: &str) -> Result<(), String> {
+        Err("This feature is only available on Windows".to_string())
+    }
+
+    pub fn toggle_mute_sync() -> Result<bool, String> {
+        Err("This feature is only available on Windows".to_string())
+    }
+
+    pub fn get_mute_state() -> Result<bool, String> {
         Err("This feature is only available on Windows".to_string())
     }
 }
@@ -331,6 +428,20 @@ async fn control_playback(action: String) -> Result<(), String> {
         .map_err(|e| format!("Task join error: {}", e))?
 }
 
+#[tauri::command]
+async fn toggle_mute() -> Result<bool, String> {
+    tokio::task::spawn_blocking(|| windows_media::toggle_mute_sync())
+        .await
+        .map_err(|e| format!("Task join error: {}", e))?
+}
+
+#[tauri::command]
+async fn get_mute_state() -> Result<bool, String> {
+    tokio::task::spawn_blocking(|| windows_media::get_mute_state())
+        .await
+        .map_err(|e| format!("Task join error: {}", e))?
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -338,7 +449,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_media_sessions,
             get_media_info,
-            control_playback
+            control_playback,
+            toggle_mute,
+            get_mute_state
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

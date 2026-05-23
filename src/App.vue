@@ -5,6 +5,7 @@
         <div class="media-info">
           <div class="album-cover">
             <img
+              class="img"
               v-if="mediaInfo?.thumbnail"
               :src="mediaInfo.thumbnail"
               alt="专辑封面"
@@ -171,10 +172,22 @@ function selectSession(sessionId: string) {
   loadMediaInfo();
 }
 
-function toggleMute() {
-  isMuted.value = !isMuted.value;
-  // 这里可以添加实际的音量控制逻辑
-  // 例如调用 Tauri 后端的音量控制命令
+async function toggleMute() {
+  try {
+    const newMuteState = await invoke<boolean>("toggle_mute");
+    isMuted.value = newMuteState;
+  } catch (error) {
+    console.error("Failed to toggle mute:", error);
+  }
+}
+
+async function loadMuteState() {
+  try {
+    const muteState = await invoke<boolean>("get_mute_state");
+    isMuted.value = muteState;
+  } catch (error) {
+    console.error("Failed to load mute state:", error);
+  }
 }
 
 function formatTime(seconds: number): string {
@@ -212,6 +225,7 @@ onMounted(() => {
   // 初始加载
   loadSessions();
   loadMediaInfo();
+  loadMuteState();
 
   // 定时更新
   updateInterval = window.setInterval(() => {
@@ -287,13 +301,14 @@ body {
   gap: 12px;
   margin-bottom: 8px;
 }
-
+.img {
+  opacity: 0.9;
+}
 .album-cover {
   width: 52px;
   height: 52px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   display: flex;
   align-items: center;
